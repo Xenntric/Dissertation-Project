@@ -1,0 +1,9 @@
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/bin/Debug/Dissertation Project.dll
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/bin/Debug/Dissertation Project.pdb
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.csproj.AssemblyReference.cache
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.GeneratedMSBuildEditorConfig.editorconfig
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.AssemblyInfoInputs.cache
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.AssemblyInfo.cs
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.csproj.CoreCompileInputs.cache
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.dll
+/mnt/LINUX_MiscHDD/GODOT/Dissertation Project/.mono/temp/obj/Debug/Dissertation Project.pdb
