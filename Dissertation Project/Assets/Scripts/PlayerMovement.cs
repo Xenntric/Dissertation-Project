@@ -1,22 +1,22 @@
 using Godot;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 public class PlayerMovement : KinematicBody2D
 {
     [Export]
 	public KinematicBody2D Player;
     public Node2D Polygons;
     public Skeleton2D Skeleton;
-
-	[Export]
-	public float max_speed = 180;
+	public AnimationTree AnimTree;
+	[Export] public float max_speed = 180;
     public float acceleration = 200;
 
     public Vector2 velocity;
     public float dir_poly;
     public float dir_skele;
 
-    public AnimationTree AnimTree;
+    [Export] public StaticBody2D current_grab;
     private bool moving;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -26,7 +26,7 @@ public class PlayerMovement : KinematicBody2D
         Polygons = GetNode<Node2D>("/root/World/Player/Player Polygons");
         Skeleton = GetNode<Skeleton2D>("/root/World/Player/Skeleton Frog");
         AnimTree = GetNode<AnimationTree>("/root/World/Player/Animations/AnimationTree");
-        
+            
         dir_poly = Polygons.Scale.x;
         dir_skele = Skeleton.Scale.x;
     }
@@ -67,11 +67,21 @@ public class PlayerMovement : KinematicBody2D
         // The second parameter of "MoveAndSlide" is the normal pointing up.
         // In the case of a 2D platformer, in Godot, upward is negative y, which translates to -1 as a normal.
         MoveAndSlide(velocity);
-        GD.Print("Velocity: " + velocity);
-	}
+        //GD.Print("Velocity: " + velocity);
+    }
     public override void _Input(InputEvent inputEvent)
 	{
 
     }
-
+    
+    private void _On_Detection_Entered(StaticBody2D body)
+	{
+        current_grab = body;
+		GD.Print("on body entered " + body.GetChild<Sprite>(1).Name);
+	}
+    private void _On_Detection_Exited(StaticBody2D body)
+	{
+        current_grab = null;
+		GD.Print("on body exited " + body.GetChild<Sprite>(1).Name);
+	}
 }

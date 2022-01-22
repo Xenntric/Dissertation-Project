@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=29 format=2]
 
 [ext_resource path="res://Assets/Sprites/Malachi PNGs/Malachi Sprite/Sprite Sheet/SpriteSheet.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Environment/Updated_Train_Background_2.png" type="Texture" id=2]
@@ -17,11 +17,20 @@
 radius = 44.0
 height = 120.0
 
+[sub_resource type="CircleShape2D" id=15]
+radius = 265.409
+
+[sub_resource type="CircleShape2D" id=17]
+radius = 361.042
+
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 1020.51, 181.07 )
 
+[sub_resource type="RectangleShape2D" id=16]
+extents = Vector2( 80, 113 )
+
 [sub_resource type="CapsuleShape2D" id=3]
-radius = 40.0
+radius = 23.2558
 height = 126.0
 
 [sub_resource type="Animation" id=4]
@@ -954,28 +963,53 @@ position = Vector2( -5, 215 )
 rest = Transform2D( 1, 0, 0, 1, -5, 215 )
 default_length = 80.0
 
+[node name="Characters" type="Node" parent="."]
+
+[node name="BrickStaticBody" type="StaticBody2D" parent="Characters"]
+position = Vector2( 43, 163 )
+scale = Vector2( 0.231597, 0.228339 )
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Characters/BrickStaticBody"]
+scale = Vector2( 1, 1 )
+shape = SubResource( 15 )
+one_way_collision_margin = 0.0
+
+[node name="Brick" type="Sprite" parent="Characters/BrickStaticBody"]
+scale = Vector2( 1, 1 )
+texture = ExtResource( 5 )
+flip_h = true
+
+[node name="JamStaticBody" type="StaticBody2D" parent="Characters"]
+position = Vector2( 342, 128 )
+scale = Vector2( 0.322258, 0.322258 )
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Characters/JamStaticBody"]
+shape = SubResource( 17 )
+
+[node name="Jam" type="Sprite" parent="Characters/JamStaticBody"]
+position = Vector2( 12.4126, -6.20621 )
+scale = Vector2( 1, 0.999999 )
+texture = ExtResource( 8 )
+flip_h = true
+
 [node name="Environment Nodes" type="Node2D" parent="."]
 position = Vector2( 207, -252 )
 
 [node name="UpdatedTrainBackground2" type="Sprite" parent="Environment Nodes"]
 position = Vector2( 287, 339 )
 scale = Vector2( 0.21, 0.25 )
+z_index = -1
 texture = ExtResource( 2 )
-
-[node name="11-01Beasts01" type="Sprite" parent="Environment Nodes"]
-position = Vector2( -164, 415 )
-scale = Vector2( 0.231597, 0.228339 )
-texture = ExtResource( 5 )
-flip_h = true
-
-[node name="11-01Beasts02" type="Sprite" parent="Environment Nodes"]
-position = Vector2( 135, 380 )
-scale = Vector2( 0.322258, 0.322258 )
-texture = ExtResource( 8 )
-flip_h = true
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Environment Nodes"]
 position = Vector2( -207, 252 )
+z_index = -1
+collision_layer = 0
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Environment Nodes/StaticBody2D"]
 position = Vector2( 3.00005, 279 )
@@ -989,9 +1023,19 @@ texture = ExtResource( 3 )
 
 [node name="Player" type="KinematicBody2D" parent="."]
 position = Vector2( -237, 170 )
+z_index = 1
 script = ExtResource( 4 )
 
+[node name="Interact Detector" type="Area2D" parent="Player"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Interact Shape" type="CollisionShape2D" parent="Player/Interact Detector"]
+position = Vector2( -1, -3 )
+shape = SubResource( 16 )
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+scale = Vector2( 1.72, 1 )
 shape = SubResource( 3 )
 
 [node name="Player Polygons" type="Node2D" parent="Player"]
@@ -1094,7 +1138,7 @@ rest = Transform2D( 2.22127e-06, -1, 1, 2.22127e-06, -1, 44 )
 default_length = 64.0
 
 [node name="Head" type="Bone2D" parent="Player/Skeleton Frog/Body"]
-position = Vector2( 84.1496, 0.999817 )
+position = Vector2( 84.5594, 0.999817 )
 rotation = 1.57587
 rest = Transform2D( -0.0050744, 0.999987, -0.999987, -0.0050744, 85, 0.999817 )
 
@@ -1134,7 +1178,7 @@ rest = Transform2D( 0.85898, 0.51201, -0.51201, 0.85898, 21.9545, -0.0262299 )
 
 [node name="Hand R" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm R/Forearm R"]
 position = Vector2( 27, -0.999954 )
-rotation = 0.133574
+rotation = 0.0692164
 rest = Transform2D( 1, 0, 0, 1, 27, -0.999954 )
 
 [node name="Leg L" type="Bone2D" parent="Player/Skeleton Frog/Body"]
@@ -1188,7 +1232,7 @@ rest = Transform2D( 0.866026, 0.499999, -0.499999, 0.866026, 21.9545, -0.0262299
 
 [node name="Hand L" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm L/Forearm L"]
 position = Vector2( 28, 4.57764e-05 )
-rotation = 0.133574
+rotation = 0.0692164
 rest = Transform2D( 1, 0, 0, 1, 28, 4.57764e-05 )
 
 [node name="Animations" type="Node" parent="Player"]
@@ -1209,3 +1253,6 @@ active = true
 "parameters/Idle + Walking Blend Tree/Blend2 2/blend_amount" = 0.0
 
 [node name="Scripts" type="Node" parent="Player"]
+
+[connection signal="body_entered" from="Player/Interact Detector" to="Player" method="_On_Detection_Entered"]
+[connection signal="body_exited" from="Player/Interact Detector" to="Player" method="_On_Detection_Exited"]

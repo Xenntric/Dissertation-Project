@@ -42,6 +42,11 @@ interact={
  ]
 }
 
+[layer_names]
+
+2d_render/layer_1="Physical Collision Layer"
+2d_render/layer_2="Overlap Trigger Layer"
+
 [physics]
 
 common/enable_pause_aware_picking=true
