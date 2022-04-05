@@ -1,24 +1,26 @@
 using Godot;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 public struct DialogueLoader
 {
     private Godot.Collections.Array<Node> LoadCharacters;
-    System.Collections.Generic.List<string> TextFiles;
+    private System.Collections.Generic.List<string> TextFiles;
+    private System.Collections.Generic.List<Tuple<Node,string>> PairedScripts;
     
-    public System.Collections.Generic.List<string> LoadTextFiles(Godot.Collections.Array<Node> Characters)
+    public System.Collections.Generic.List<Tuple<Node,string>> LoadTextFiles(Godot.Collections.Array<Node> Characters)
     {
-        TextFiles = new System.Collections.Generic.List<string>();
-        this.LoadCharacters = Characters;
+        PairedScripts = new List<Tuple<Node,string>>();
+        TextFiles = new List<string>();
+        LoadCharacters = Characters;
 
-        for (int i = 0; i < this.LoadCharacters.Count; i++)
+        for (int i = 0; i < LoadCharacters.Count; i++)
         {
-            var address = System.IO.Path.Combine(@"Assets/Dialogue/", this.LoadCharacters[i].Name.ToLower());
+            var address = System.IO.Path.Combine(@"Assets/Dialogue/", LoadCharacters[i].Name.ToLower());
             TextFiles.Add(System.IO.File.ReadAllText(address));
-            GD.Print("text file " + i + ":\n" + TextFiles[i]);
+            PairedScripts.Add(new Tuple<Node, string>(LoadCharacters[i],TextFiles[i]));
         }
-
-        return TextFiles;
+        return PairedScripts;
     }
 }

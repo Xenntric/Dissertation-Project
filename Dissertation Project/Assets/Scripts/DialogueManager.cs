@@ -13,29 +13,37 @@ public class DialogueManager : Node
 	public List<StaticBody2D> Characters; */
 	// Declare member variables here. Examples:
 	//public System.IO.File text_file;
-	public string TextFile;
+
+	/* public string TextFile;
     public List<string> TextLines;
     public List<Node> Characters;
     private int lines;
     private int chars;
-    private string LineToRead;
+    private string LineToRead;*/
 
     private Godot.Collections.Array<Node> NPCs;
-     DialogueLoader DL;
-    //PlayerMovement PM;
+    private List<Tuple<Node,string>> tFiles;
+    private DialogueLoader DL;
+    private List<Node> NPCstack;
 
-    private int lineToRead;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-        NPCs = new Godot.Collections.Array<Node>(GetNode("../../NPCs").GetChildren());
-        var tFiles = DL.LoadTextFiles(NPCs);
+        NPCs = new Godot.Collections.Array<Node>(GetNode("../NPCs").GetChildren());
+        tFiles = new List<Tuple<Node, string>>(DL.LoadTextFiles(NPCs));
+        NPCstack = new List<Node>();
+
+        /* for (int i = 0; i < NPCs.Count; i++)
+        {
+            GD.Print("Script " + i + "\n" + tFiles[i].Item1.Name + "\n"
+            + tFiles[i].Item2);
+        } */
 
         
+
         //chars = GetNode("../../NPCs").GetChildCount();
         //GD.Print(chars);
         
-
         //TextLines = new List<string>();
 		//Characters = new Godot.Collections.Dictionary<int>();
 		//text_string = System.IO.File.ReadAllText($"Assets/Dialogue/TestDialogue");
@@ -52,9 +60,7 @@ public class DialogueManager : Node
                 TextLines.Add(line);
             }
             GD.Print(lines);
-		} */
-
-		
+		}*/
 
 		/* int counter = 0;
 		foreach (var line in text_string)
@@ -65,19 +71,27 @@ public class DialogueManager : Node
 		} */
 	}
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-  public override void _Process(float delta)
-  {
-	  if(Input.IsActionJustPressed("ui_accept"))
+    public void ReadLine()
+    {
+        if(NPCstack != null)
         {
-            //GD.Print("ding");
-
-            foreach (var line in TextLines)
+            for (int i = 0; i < tFiles.Count; i++)
             {
-                GD.Print(line);
-                //GD.Print("dong");
+                if(NPCstack.Contains(tFiles[i].Item1))
+                {
+                    GD.Print("NPC " + tFiles[i].Item1.Name);
+                    GD.Print(tFiles[i].Item2);
+                }
             }
-
         }
-  }
+    }
+
+    public void AddNPC(Node NPC)
+    {
+        NPCstack.Add(NPC);
+    }
+    public void PopNPC()
+    {
+        NPCstack.RemoveAt(0);
+    }
 }

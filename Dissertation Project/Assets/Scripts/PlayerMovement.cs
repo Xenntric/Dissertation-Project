@@ -4,48 +4,51 @@ using System.Collections.Generic;
 using System.Linq;
 public class PlayerMovement : KinematicBody2D
 {
-    [Export]
-	public KinematicBody2D Player;
-    public Node2D Polygons;
-    public Skeleton2D Skeleton;
-	public AnimationTree AnimTree;
-	[Export] public float max_speed = 180;
-    public float acceleration = 200;
-
+    private Node2D Polygons;
+    public KinematicBody2D Player;
+    private Skeleton2D Skeleton;
+	private AnimationTree AnimTree;
+	private float max_speed = 180;
+    private float acceleration = 200;
     public Vector2 velocity;
-    public float dir_poly;
-    public float dir_skele;
+    private float dir_poly;
+    private float dir_skele;
+    private Tuple<Vector2, Vector2> PolySkeleScales;
+    public Node current_grab;
 
-    [Export] public StaticBody2D current_grab;
-    private bool moving;
+    private DialogueManager DM;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
-    {
+    { 
+        DM = GetNode<DialogueManager>("../Dialogue Manager");
         
-        Player = GetNode<KinematicBody2D>("/root/World/Player");
-        Polygons = GetNode<Node2D>("/root/World/Player/Player Polygons");
-        Skeleton = GetNode<Skeleton2D>("/root/World/Player/Skeleton Frog");
-        AnimTree = GetNode<AnimationTree>("/root/World/Player/Animations/AnimationTree");
-            
-        dir_poly = Polygons.Scale.x;
-        dir_skele = Skeleton.Scale.x;
+        Player = GetNode<KinematicBody2D>(".");
+        Polygons = GetNode<Node2D>("Player Polygons");
+        Skeleton = GetNode<Skeleton2D>("Skeleton Frog");
+        AnimTree = GetNode<AnimationTree>("Animations/AnimationTree");
+        PolySkeleScales = new Tuple<Vector2,Vector2>(
+            new Vector2(Polygons.Scale.x,Polygons.Scale.y),
+            new Vector2(Skeleton.Scale.x,Skeleton.Scale.y));
+
+        dir_poly = PolySkeleScales.Item1.x;
+        dir_skele = PolySkeleScales.Item2.x;
     }
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(float delta)
 	{
         //velocity.y += delta * gravity;
 
         if (Input.IsActionPressed("move_left") && velocity.x >= -max_speed)
         {
-            dir_poly    = -.33F;
-            dir_skele   = -1;
+            dir_poly    = -PolySkeleScales.Item1.x;
+            dir_skele   = -PolySkeleScales.Item2.x;
             velocity.x -= acceleration * delta;
         }
         else if (Input.IsActionPressed("move_right") && velocity.x <= max_speed)
         {
-            dir_poly    = .33F;
-            dir_skele   = 1;
+            dir_poly    = PolySkeleScales.Item1.x;
+            dir_skele   = PolySkeleScales.Item2.x;
             velocity.x += acceleration * delta;
         }
         else
@@ -53,8 +56,8 @@ public class PlayerMovement : KinematicBody2D
             velocity.x = Mathf.Lerp(velocity.x, 0, .1F);
         }
         
-        Polygons.Scale = new Vector2(dir_poly, Polygons.Scale.y);
-        Skeleton.Scale = new Vector2(dir_skele, Skeleton.Scale.y);
+        Polygons.Scale = new Vector2(dir_poly, PolySkeleScales.Item1.y);
+        Skeleton.Scale = new Vector2(dir_skele, PolySkeleScales.Item2.y);
         
         var animVelocity = (velocity.x/max_speed);
         if (animVelocity < 0)
@@ -68,20 +71,21 @@ public class PlayerMovement : KinematicBody2D
         // In the case of a 2D platformer, in Godot, upward is negative y, which translates to -1 as a normal.
         MoveAndSlide(velocity);
         //GD.Print("Velocity: " + velocity);
-    }
-    public override void _Input(InputEvent inputEvent)
-	{
-
+        
+        if(Input.IsActionJustPressed("ui_accept"))
+        {
+            DM.ReadLine();
+        }
     }
     
-    private void _On_Detection_Entered(StaticBody2D body)
+    public void _On_Detection_Entered(StaticBody2D body)
 	{
-        current_grab = body;
-		GD.Print("on body entered " + body.GetChild<Sprite>(1).Name);
+        DM.AddNPC(body);
+		GD.Print("on body entered " + body.Name);
 	}
-    private void _On_Detection_Exited(StaticBody2D body)
+    public void _On_Detection_Exited(StaticBody2D body)
 	{
-        current_grab = null;
-		GD.Print("on body exited " + body.GetChild<Sprite>(1).Name);
+        DM.PopNPC();
+        GD.Print("on body exited " + body.Name);
 	}
 }
