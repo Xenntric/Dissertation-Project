@@ -4,7 +4,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Collections.Generic;
-
 public class DialogueManager : Node
 {
 	
@@ -80,10 +79,45 @@ public class DialogueManager : Node
                 if(NPCstack.Contains(tFiles[i].Item1))
                 {
                     GD.Print("NPC " + tFiles[i].Item1.Name);
-                    GD.Print(tFiles[i].Item2);
+                    ParseLine(tFiles[i].Item2);
                 }
             }
         }
+    }
+
+    public void ParseLine(string text)
+    {
+        int lines = new int();
+
+        foreach (Match match in Regex.Matches(text, @"(/\r?\n/g)"))
+        {
+            lines++;
+        }
+        //(/\r?\n/g)
+        //(.*?)\
+        var line = Regex.Match(text, @"(.*?)\n");
+        var dialogue = Regex.Match(line.ToString(), @"(^[^|]*)");
+
+        if(Regex.Match(line.ToString(), @"[|]+").Success)
+        {
+            var emoteReg = Regex.Match(line.ToString(), @"\|(.*?)\n");
+            string emote = PopFirstChar(emoteReg);
+
+            GD.Print(dialogue);
+            GD.Print(emote);
+        }
+        else
+        {
+            GD.Print(dialogue);
+        }
+    }
+
+    private static string PopFirstChar(Match emoteReg)
+    {
+        List<char> StripChar = new List<char>(emoteReg.ToString().ToCharArray());
+        StripChar.RemoveAt(0);
+        var emote = new string(StripChar.ToArray());
+        return emote;
     }
 
     public void AddNPC(Node NPC)
