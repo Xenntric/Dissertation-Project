@@ -14,7 +14,7 @@ public class PlayerMovement : KinematicBody2D
     private float dir_poly;
     private float dir_skele;
     private Tuple<Vector2, Vector2> PolySkeleScales;
-    public Node current_grab;
+    private Node current_grab;
 
     private DialogueManager DM;
     // Called when the node enters the scene tree for the first time.

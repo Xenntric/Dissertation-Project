@@ -1,29 +1,19 @@
 using Godot;
 using System;
+using Godot.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Collections.Generic;
+
+
 public class DialogueManager : Node
 {
-	
-	//public Godot.Collections.Dictionary<T> Characters;
-	/* [Export]
-	public List<StaticBody2D> Characters; */
-	// Declare member variables here. Examples:
-	//public System.IO.File text_file;
-
-	/* public string TextFile;
-    public List<string> TextLines;
-    public List<Node> Characters;
-    private int lines;
-    private int chars;
-    private string LineToRead;*/
-
     private Godot.Collections.Array<Node> NPCs;
     private List<Tuple<Node,string>> tFiles;
     private DialogueLoader DL;
     private List<Node> NPCstack;
+    [Export] public List<Texture> Emotes;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -31,43 +21,6 @@ public class DialogueManager : Node
         NPCs = new Godot.Collections.Array<Node>(GetNode("../NPCs").GetChildren());
         tFiles = new List<Tuple<Node, string>>(DL.LoadTextFiles(NPCs));
         NPCstack = new List<Node>();
-
-        /* for (int i = 0; i < NPCs.Count; i++)
-        {
-            GD.Print("Script " + i + "\n" + tFiles[i].Item1.Name + "\n"
-            + tFiles[i].Item2);
-        } */
-
-        
-
-        //chars = GetNode("../../NPCs").GetChildCount();
-        //GD.Print(chars);
-        
-        //TextLines = new List<string>();
-		//Characters = new Godot.Collections.Dictionary<int>();
-		//text_string = System.IO.File.ReadAllText($"Assets/Dialogue/TestDialogue");
-		//GD.Print(text_string);
-
-		/* TextFile = @"Assets/Dialogue/TestDialogue";
-		using (StreamReader ReaderObject = new StreamReader(TextFile))
-		{
-			string line;
-			while((line = ReaderObject.ReadLine()) != null)
-            {
-                lines++;
-                GD.Print(line);
-                TextLines.Add(line);
-            }
-            GD.Print(lines);
-		}*/
-
-		/* int counter = 0;
-		foreach (var line in text_string)
-		{
-			GD.Print(line);
-			counter++;
-			GD.Print("end of line 1");
-		} */
 	}
 
     public void ReadLine()
@@ -79,22 +32,28 @@ public class DialogueManager : Node
                 if(NPCstack.Contains(tFiles[i].Item1))
                 {
                     GD.Print("NPC " + tFiles[i].Item1.Name);
-                    ParseLine(tFiles[i].Item2);
+                    var DialogueToEnact = ParseLine(tFiles[i].Item2);
+                    
+                    if (DialogueToEnact.Item2 == null)
+                    {
+                        //Line only has dialogue
+                        GD.Print(DialogueToEnact.Item1);
+                    }
+                    else
+                    {
+                        //Line has both dialogue and an emote
+                        GD.Print(DialogueToEnact.Item1);
+                        GD.Print(DialogueToEnact.Item2);
+                        MatchEmoteToImage(tFiles[i].Item1, DialogueToEnact.Item2);
+                    }
                 }
             }
         }
     }
 
-    public void ParseLine(string text)
+    public Tuple<string,string> ParseLine(string text)
     {
-        int lines = new int();
 
-        foreach (Match match in Regex.Matches(text, @"(/\r?\n/g)"))
-        {
-            lines++;
-        }
-        //(/\r?\n/g)
-        //(.*?)\
         var line = Regex.Match(text, @"(.*?)\n");
         var dialogue = Regex.Match(line.ToString(), @"(^[^|]*)");
 
@@ -102,13 +61,46 @@ public class DialogueManager : Node
         {
             var emoteReg = Regex.Match(line.ToString(), @"\|(.*?)\n");
             string emote = PopFirstChar(emoteReg);
-
-            GD.Print(dialogue);
-            GD.Print(emote);
+            emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
+            return new Tuple<string, string>(dialogue.ToString(),emote);
         }
         else
         {
-            GD.Print(dialogue);
+            return new Tuple<string, string>(dialogue.ToString(),null);
+        }
+    }
+
+    private void MatchEmoteToImage(Node NPC, string emote)
+    {
+        emote = emote + ".PNG";
+        foreach (var image in Emotes)
+        {
+            var emoteFilename = Regex.Match(image.ResourcePath.ToString(), @"[^\/]+$");
+            
+            GD.Print(image.ResourceName.ToString());
+            //GD.Print(emote.ToString());
+            if (emote == emoteFilename.ToString())
+            {
+                GD.Print("ding");
+                string NPCsPath = "../NPCs/" + NPC.Name;
+                var NPCproperties = GetNode<StaticBody2D>(new NodePath(NPCsPath));
+
+                //Targets the EmotePoint node which needs to be the first Child of 'Targets'
+                var EmotePoint = GetNode(new NodePath(NPCsPath + "/" + "Targets")).GetChild(0) as Node2D;
+
+                var img = new Sprite();
+                img.Texture = image;
+                img.Scale = new Vector2(NPCproperties.Scale);
+                img.Position = new Vector2(EmotePoint.Position);
+                img.ZIndex = NPCproperties.ZIndex + 1;
+                
+                GD.Print(NPC.Name);
+                AddChild(img);
+            }
+            else
+            {
+                GD.Print("dong");
+            }
         }
     }
 
@@ -128,4 +120,10 @@ public class DialogueManager : Node
     {
         NPCstack.RemoveAt(0);
     }
+
+    /* EditorSelection editorSelection;
+    public Godot.Collections.Array returnSelection()
+    {
+        return editorSelection.GetSelectedNodes();
+    }  */
 }
