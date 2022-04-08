@@ -871,7 +871,7 @@ rest = Transform2D( 2.22127e-06, -1, 1, 2.22127e-06, -1, 44 )
 default_length = 64.0
 
 [node name="Head" type="Bone2D" parent="Player/Skeleton Frog/Body"]
-position = Vector2( 84.3141, 0.999817 )
+position = Vector2( 84.5775, 0.999817 )
 rotation = 1.57587
 rest = Transform2D( -0.0050744, 0.999987, -0.999987, -0.0050744, 85, 0.999817 )
 
@@ -911,7 +911,7 @@ rest = Transform2D( 0.85898, 0.51201, -0.51201, 0.85898, 21.9545, -0.0262299 )
 
 [node name="Hand R" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm R/Forearm R"]
 position = Vector2( 27, -0.999954 )
-rotation = 0.107746
+rotation = 0.0663592
 rest = Transform2D( 1, 0, 0, 1, 27, -0.999954 )
 
 [node name="Leg L" type="Bone2D" parent="Player/Skeleton Frog/Body"]
@@ -965,7 +965,7 @@ rest = Transform2D( 0.866026, 0.499999, -0.499999, 0.866026, 21.9545, -0.0262299
 
 [node name="Hand L" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm L/Forearm L"]
 position = Vector2( 28, 4.57764e-05 )
-rotation = 0.107746
+rotation = 0.0663592
 rest = Transform2D( 1, 0, 0, 1, 28, 4.57764e-05 )
 
 [node name="Animations" type="Node" parent="Player"]

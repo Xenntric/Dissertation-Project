@@ -9,31 +9,41 @@ using System.Collections.Generic;
 
 public class DialogueManager : Node
 {
-    private Godot.Collections.Array<Node> NPCs;
     private List<Tuple<Node,string>> tFiles;
     private DialogueLoader DL;
     private List<Node> NPCstack;
     [Export] public List<Texture> Emotes;
+    public List<NPCs> NPCList;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-        NPCs = new Godot.Collections.Array<Node>(GetNode("../NPCs").GetChildren());
-        tFiles = new List<Tuple<Node, string>>(DL.LoadTextFiles(NPCs));
         NPCstack = new List<Node>();
+        NPCList = new List<NPCs>();
+
+        for (int i = 0; i < GetNode("../NPCs").GetChildren().Count; i++)
+        {
+            NPCList.Add(new NPCs());
+            NPCList[i].SetCharacter(GetNode("../NPCs").GetChild(i));
+            NPCList[i].SetTextFile(DL.LoadFile(NPCList[i].GetCharacter()));
+            NPCList[i].SetLines(DL.LoadLines(NPCList[i].GetTextFile()));
+        }
 	}
 
     public void ReadLine()
     {
         if(NPCstack != null)
         {
-            for (int i = 0; i < tFiles.Count; i++)
+            for (int i = 0; i < NPCList.Count; i++)
             {
-                if(NPCstack.Contains(tFiles[i].Item1))
+                if(NPCstack.Contains(NPCList[i].GetCharacter()))
                 {
-                    GD.Print("NPC " + tFiles[i].Item1.Name);
-                    var DialogueToEnact = ParseLine(tFiles[i].Item2);
-                    
+                    GD.Print("NPC " + NPCList[i].GetCharacter().Name);
+                    //GD.Print("Test: " + NPCList[i].GetCharacter().Name + "\n" + NPCList[i].GetLines()[0]);
+
+
+                    var DialogueToEnact = ParseLine(NPCList[i], NPCList[i].GetTextFile());
+
                     if (DialogueToEnact.Item2 == null)
                     {
                         //Line only has dialogue
@@ -44,22 +54,24 @@ public class DialogueManager : Node
                         //Line has both dialogue and an emote
                         GD.Print(DialogueToEnact.Item1);
                         GD.Print(DialogueToEnact.Item2);
-                        MatchEmoteToImage(tFiles[i].Item1, DialogueToEnact.Item2);
+                        MatchEmoteToImage(NPCList[i].GetCharacter(), DialogueToEnact.Item2);
                     }
+                    NPCList[i].SetTimesTalkedTo(NPCList[i].GetTimesTalkedTo() + 1);
                 }
             }
         }
     }
 
-    public Tuple<string,string> ParseLine(string text)
+    public Tuple<string,string> ParseLine(NPCs character, string text)
     {
+        GD.Print("Times Talked To: " + character.GetTimesTalkedTo());
+        var line = character.GetLines()[character.GetTimesTalkedTo()];
+        var dialogue = Regex.Match(line, @"(^[^|]*)");
 
-        var line = Regex.Match(text, @"(.*?)\n");
-        var dialogue = Regex.Match(line.ToString(), @"(^[^|]*)");
 
-        if(Regex.Match(line.ToString(), @"[|]+").Success)
+        if(Regex.Match(line, @"[|]+").Success)
         {
-            var emoteReg = Regex.Match(line.ToString(), @"\|(.*?)\n");
+            var emoteReg = Regex.Match(line, @"\|(.*?)\n");
             string emote = PopFirstChar(emoteReg);
             emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
             return new Tuple<string, string>(dialogue.ToString(),emote);
@@ -77,11 +89,10 @@ public class DialogueManager : Node
         {
             var emoteFilename = Regex.Match(image.ResourcePath.ToString(), @"[^\/]+$");
             
-            GD.Print(image.ResourceName.ToString());
+            //GD.Print(image.ResourceName.ToString());
             //GD.Print(emote.ToString());
             if (emote == emoteFilename.ToString())
             {
-                GD.Print("ding");
                 string NPCsPath = "../NPCs/" + NPC.Name;
                 var NPCproperties = GetNode<StaticBody2D>(new NodePath(NPCsPath));
 
@@ -94,12 +105,12 @@ public class DialogueManager : Node
                 img.Position = new Vector2(EmotePoint.Position);
                 img.ZIndex = NPCproperties.ZIndex + 1;
                 
-                GD.Print(NPC.Name);
+                //GD.Print(NPC.Name);
                 AddChild(img);
             }
             else
             {
-                GD.Print("dong");
+                //GD.Print("damn");
             }
         }
     }
