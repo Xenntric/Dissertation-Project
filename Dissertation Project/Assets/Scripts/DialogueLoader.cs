@@ -21,9 +21,9 @@ public struct DialogueLoader
     {
         var lineList = new List<string>();
         //@"(/\r?\n/g)"
+        //Extract each line in file
         foreach (Match match in Regex.Matches(file, @"(.*?)\n"))
         {
-            //@"(.*?)\n"
             var line = match.ToString();
             lineList.Add(line);
         }
