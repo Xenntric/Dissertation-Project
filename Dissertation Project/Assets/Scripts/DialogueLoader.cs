@@ -13,6 +13,12 @@ public struct DialogueLoader
     public string LoadFile(Node Character)
     {
         var address = System.IO.Path.Combine(@"Assets/Dialogue/",Character.Name.ToLower());
+        //If file can't be found
+        if(!System.IO.File.Exists(address))
+        {
+            //GD.Print("doesnt Exist");
+            return null;
+        }
         var file = System.IO.File.ReadAllText(address);
         return file.ToString();
     }

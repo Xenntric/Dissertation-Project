@@ -16,6 +16,7 @@ public class DialogueManager : Node
     private List<NPCs> NPCList;
     private RichTextLabel CurrentText;
 
+    private RegexCheck RegCheck;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -31,64 +32,111 @@ public class DialogueManager : Node
         for (int i = 0; i < GetNode("../NPCs").GetChildren().Count; i++)
         {
             NPCList.Add(new NPCs());
-            NPCList[i].SetCharacter(GetNode("../NPCs").GetChild(i));
-            NPCList[i].SetTextFile(DL.LoadFile(NPCList[i].GetCharacter()));
-            NPCList[i].SetLines(DL.LoadLines(NPCList[i].GetTextFile()));
+            NPCList[i].Character = (GetNode("../NPCs").GetChild(i));
+            NPCList[i].TextFile = (DL.LoadFile(NPCList[i].Character));
+
+            //If there's no file, don't bother trying to find the lines.
+            if(NPCList[i].TextFile != null )
+            {
+                NPCList[i].Lines = (DL.LoadLines(NPCList[i].TextFile));
+            }
         }
 	}
     public void ReadLine()
     {
+        //If the Player is near an NPC
         if(NPCstack != null)
-        {
+        {  
+            //For(amount of NPCs in Scene)
             for (int i = 0; i < NPCList.Count; i++)
             {
-                if(NPCstack.Contains(NPCList[i].GetCharacter()))
+                //First Match of Nearby NPC
+                if(NPCstack.Contains(NPCList[i].Character))
                 {
-                    GD.Print("NPC " + NPCList[i].GetCharacter().Name);
-                    //GD.Print("Test: " + NPCList[i].GetCharacter().Name + "\n" + NPCList[i].GetLines()[0]);
+                    var enumerator = new RegexCheck.Parse();
 
-                    var DialogueToEnact = ParseLine(NPCList[i], NPCList[i].GetTextFile());
+                    /***CATCH FOR NOT FINDING FILE ***/
+                    if (NPCList[i].TextFile == null)
+                    {
+                        GD.Print("No File for " + NPCList[i].Character.Name + " found");
+                        return;
+                    }
 
+                    var ReadLine = NPCList[i].Lines[NPCList[i].TimesTalkedTo];
+                    var character = NPCList[i].Character;
+                    Tuple<string, string> linetosay = new Tuple<string, string>(null, null);
+
+                    enumerator = SetEnumerator(ReadLine, ref linetosay);
+                    ActOnEnumerator(i, enumerator, character, linetosay);
+
+                    GD.Print("NPC " + NPCList[i].Character.Name);
+                    GD.Print("Times Talked To: " + NPCList[i].TimesTalkedTo);
+                }
+            }
+        }
+    }
+
+    private RegexCheck.Parse SetEnumerator(string ReadLine, ref Tuple<string, string> linetosay)
+    {
+        RegexCheck.Parse enumerator;
+        if (RegCheck.END.IsMatch(ReadLine))
+        {
+            enumerator = RegexCheck.Parse.End;
+        }
+        else
+        {
+            linetosay = new Tuple<string, string>(
+            RegCheck.DIALOGUE.Match(ReadLine).ToString(),
+            PopChar(RegCheck.EMOTE.Match(ReadLine)));
+
+            if (RegCheck.HasEMOTE(ReadLine))
+            {
+                enumerator = RegexCheck.Parse.DialogueEmote;
+                GD.Print("Dialogue to read: " + linetosay.Item1);
+                GD.Print("emote to read: " + linetosay.Item2);
+            }
+            else
+            {
+                enumerator = RegexCheck.Parse.Dialogue;
+            }
+        }
+
+        return enumerator;
+    }
+
+    private void ActOnEnumerator(int i, RegexCheck.Parse enumerator, Node character, Tuple<string, string> linetosay)
+    {
+        switch (enumerator)
+        {
+            case RegexCheck.Parse.DialogueEmote:
+                {
                     //if an emote sprite is already present, get rid of it
                     if (CurrentEmote.Texture != null)
                     {
                         CurrentEmote.Texture = null;
                     }
 
-                    if (DialogueToEnact.Item2 != null)
-                    {
-                        //Line has both dialogue and an emote
-                        MatchEmoteToImage(NPCList[i].GetCharacter(), DialogueToEnact.Item2);
-                    }
+                    DisplayText(character, linetosay.Item1);
+                    MatchEmoteToImage(character, linetosay.Item2);
 
-                    //Print dialogue
-                    DisplayText(i, DialogueToEnact);
-                    
-                    //Increase TimesTalkedTo counter
-                    NPCList[i].SetTimesTalkedTo(NPCList[i].GetTimesTalkedTo() + 1);
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+                    break;
                 }
-            }
-        }
-    }
-    
-    public Tuple<string,string> ParseLine(NPCs character, string text)
-    {
-        GD.Print("Times Talked To: " + character.GetTimesTalkedTo());
-        var line = character.GetLines()[character.GetTimesTalkedTo()];
-        var dialogue = Regex.Match(line, @"(^[^|]*)");
+            case RegexCheck.Parse.Dialogue:
+                {
+                    DisplayText(character, linetosay.Item1);
 
-        //Does string even have Emote qualifier?
-        if(Regex.Match(line, @"[|]+").Success)
-        {
-            //Capture string after | and before Endline
-            var emoteReg = Regex.Match(line, @"\|(.*?)\n");
-            string emote = PopFirstChar(emoteReg);
-            emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
-            return new Tuple<string, string>(dialogue.ToString(),emote);
-        }
-        else
-        {
-            return new Tuple<string, string>(dialogue.ToString(),null);
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+                    break;
+                }
+            case RegexCheck.Parse.End:
+                {
+                    DisplayText(character, null);
+                    break;
+                }
+
+            default:
+                break;
         }
     }
 
@@ -124,37 +172,28 @@ public class DialogueManager : Node
         CurrentEmote.ZIndex = NPCproperties.ZIndex + 1;
     }
 
-    private void DisplayText(int i, Tuple<string, string> DialogueToEnact)
+    private void DisplayText(Node NPC, string DialogueToEnact)
     {
-        string NPCsPath = NPCList[i].GetCharacter().GetPath();
+        string NPCsPath = NPC.GetPath();
         var TextPoint = GetNode(new NodePath(NPCsPath + "/" + "Targets")).GetChild(1) as Node2D;
 
-        CurrentText.RectSize = new Vector2(CurrentText.GetFont("mono_font").GetStringSize(DialogueToEnact.Item1) * 2);
+        CurrentText.RectSize = new Vector2(CurrentText.GetFont("mono_font").GetStringSize(DialogueToEnact) * 2);
         var centre = new Vector2(CurrentText.RectSize.x / 2, 0);
-        CurrentText.BbcodeText = ("[center]" + DialogueToEnact.Item1 + "[/center]");
+        CurrentText.BbcodeText = ("[center]" + DialogueToEnact + "[/center]");
 
         CurrentText.SetGlobalPosition(new Vector2(TextPoint.Position) - centre);
         CurrentText.ShowOnTop = true;
-        CurrentText.SetIndexed("position:z", 100);
+        //CurrentText.SetIndexed("position:z", 100);
     }
 
-    private static float GetStringWidth(string text, Font font)
+    private static string PopChar(Match emoteReg)
     {
-        float stringPixelWidth = new float();
-        foreach (char letter in text)
-        {
-            var letterPixelWidth = font.GetCharSize(letter);
-            stringPixelWidth = stringPixelWidth + letterPixelWidth.x;
-        }
-        GD.Print("width of string: " + stringPixelWidth);
-        return stringPixelWidth;
-    }
+        GD.Print("To strip: " + emoteReg.ToString());
 
-    private static string PopFirstChar(Match emoteReg)
-    {
         List<char> StripChar = new List<char>(emoteReg.ToString().ToCharArray());
         StripChar.RemoveAt(0);
         var emote = new string(StripChar.ToArray());
+        emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
         return emote;
     }
 
