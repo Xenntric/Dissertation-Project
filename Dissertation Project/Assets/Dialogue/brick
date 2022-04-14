@@ -1,3 +1,8 @@
+--BOOL(DemoBool)
+--INT(FirstDemoInt = 0)
+--INT(SecondDemoInt = 4)
+
+
 Hello there! I hope the demo is going well | !
 and that they're happy with your progress | <3
 | ?

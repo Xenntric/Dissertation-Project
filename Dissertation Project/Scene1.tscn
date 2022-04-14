@@ -1,18 +1,18 @@
 [gd_scene load_steps=31 format=2]
 
-[ext_resource path="res://Assets/Scripts/DialogueManager.cs" type="Script" id=1]
-[ext_resource path="res://Assets/Environment/Updated_Train_Background_2.png" type="Texture" id=2]
-[ext_resource path="res://Assets/Environment/Floor.png" type="Texture" id=3]
-[ext_resource path="res://Assets/Scripts/PlayerMovement.cs" type="Script" id=4]
-[ext_resource path="res://Assets/Sprites/11-01_beasts_01.png" type="Texture" id=5]
-[ext_resource path="res://Assets/Emotes/!.PNG" type="Texture" id=6]
-[ext_resource path="res://Assets/Sprites/Malachi PNGs/Malachi Sprite/Masks/Eyelid Mask.png" type="Texture" id=7]
-[ext_resource path="res://Assets/Sprites/11-01_beasts_02.png" type="Texture" id=8]
-[ext_resource path="res://Assets/Sprites/Frogman.png" type="Texture" id=9]
-[ext_resource path="res://Assets/Animation Library/Blinking.tres" type="Animation" id=10]
-[ext_resource path="res://Assets/Animation Library/Idling.tres" type="Animation" id=11]
-[ext_resource path="res://Assets/Animation Library/Walking Snappy.tres" type="Animation" id=12]
-[ext_resource path="res://Assets/Emotes/<3.PNG" type="Texture" id=13]
+[ext_resource path="res://Assets/Animation Library/Idling.tres" type="Animation" id=1]
+[ext_resource path="res://Assets/Sprites/11-01_beasts_01.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Emotes/!.PNG" type="Texture" id=3]
+[ext_resource path="res://Assets/Scripts/DialogueManager.cs" type="Script" id=4]
+[ext_resource path="res://Assets/Scripts/PlayerMovement.cs" type="Script" id=5]
+[ext_resource path="res://Assets/Emotes/<3.PNG" type="Texture" id=6]
+[ext_resource path="res://Assets/Sprites/Frogman.png" type="Texture" id=7]
+[ext_resource path="res://Assets/Animation Library/Blinking.tres" type="Animation" id=8]
+[ext_resource path="res://Assets/Environment/Floor.png" type="Texture" id=9]
+[ext_resource path="res://Assets/Environment/Updated_Train_Background_2.png" type="Texture" id=10]
+[ext_resource path="res://Assets/Sprites/11-01_beasts_02.png" type="Texture" id=11]
+[ext_resource path="res://Assets/Sprites/Malachi PNGs/Malachi Sprite/Masks/Eyelid Mask.png" type="Texture" id=12]
+[ext_resource path="res://Assets/Animation Library/Walking Snappy.tres" type="Animation" id=13]
 [ext_resource path="res://Assets/Emotes/?.PNG" type="Texture" id=14]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -686,7 +686,7 @@ position = Vector2( 207, -252 )
 position = Vector2( 290, 339 )
 scale = Vector2( 0.21, 0.25 )
 z_index = -1
-texture = ExtResource( 2 )
+texture = ExtResource( 10 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Environment Nodes"]
 position = Vector2( -207, 252 )
@@ -702,12 +702,12 @@ shape = SubResource( 1 )
 [node name="Floor" type="Sprite" parent="Environment Nodes/StaticBody2D"]
 position = Vector2( 1, 279 )
 scale = Vector2( 0.78, 0.1215 )
-texture = ExtResource( 3 )
+texture = ExtResource( 9 )
 
 [node name="Player" type="KinematicBody2D" parent="."]
 position = Vector2( -237, 170 )
 z_index = 2
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 
 [node name="Interact Detector" type="Area2D" parent="Player"]
 collision_layer = 0
@@ -728,7 +728,7 @@ scale = Vector2( 0.33, 0.33 )
 [node name="Leg R" type="Polygon2D" parent="Player/Player Polygons"]
 position = Vector2( 3.33347, 32.4848 )
 offset = Vector2( -521.212, -260.606 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 520, 550, 680, 550, 680, 530, 620, 490, 620, 430, 600, 300, 560, 260, 520, 300, 603.086, 439.506, 530.658, 442.798, 565.638, 441.152, 604.798, 489.055, 531.934, 546.477, 570.315, 514.992, 577.211, 521.889, 563.418, 507.046, 529.618, 375.827, 598.066, 372.519, 597.048, 358.015, 599.593, 386.514, 566.514, 374.555, 579.745, 366.158, 582.544, 380.662, 550.229, 368.193, 551.501, 383.969, 529.109, 362.341, 529.618, 390.585, 520.453, 444.239, 620.118, 437.106, 620.118, 458.661, 630, 520, 620, 530, 620, 540, 620, 550 )
 uv = PoolVector2Array( 520, 550, 680, 550, 680, 530, 620, 490, 620, 430, 600, 300, 560, 260, 520, 300, 603.086, 439.506, 530.658, 442.798, 565.638, 441.152, 604.798, 489.055, 531.934, 546.477, 570.315, 514.992, 577.211, 521.889, 563.418, 507.046, 529.618, 375.827, 598.066, 372.519, 597.048, 358.015, 599.593, 386.514, 566.514, 374.555, 579.745, 366.158, 582.544, 380.662, 550.229, 368.193, 551.501, 383.969, 529.109, 362.341, 529.618, 390.585, 520.453, 444.239, 620.118, 437.106, 620.118, 458.661, 630, 520, 620, 530, 620, 540, 620, 550 )
@@ -739,7 +739,7 @@ internal_vertex_count = 26
 [node name="Arm R" type="Polygon2D" parent="Player/Player Polygons"]
 position = Vector2( 79.091, -119.03 )
 offset = Vector2( -359.485, -310.364 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 360, 310, 410, 310, 470, 400, 470, 500, 440, 520, 410, 520, 390, 500, 390, 360, 360, 320, 420, 370, 440, 390, 420, 400, 450, 470, 420, 470, 400, 480, 440, 410, 420, 430, 440, 430 )
 uv = PoolVector2Array( 360, 310, 410, 310, 470, 400, 470, 500, 440, 520, 410, 520, 390, 500, 390, 360, 360, 320, 420, 370, 440, 390, 420, 400, 450, 470, 420, 470, 400, 480, 440, 410, 420, 430, 440, 430 )
@@ -750,7 +750,7 @@ internal_vertex_count = 9
 [node name="Leg L" type="Polygon2D" parent="Player/Player Polygons"]
 position = Vector2( -101.818, 30.6667 )
 offset = Vector2( -521.212, -260.606 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 520, 550, 680, 550, 680, 530, 620, 490, 620, 430, 600, 300, 560, 260, 520, 300, 603.086, 439.506, 530.658, 442.798, 565.638, 441.152, 604.798, 489.055, 531.934, 546.477, 570.315, 514.992, 577.211, 521.889, 563.418, 507.046, 529.618, 375.827, 598.066, 372.519, 597.048, 358.015, 599.593, 386.514, 566.514, 374.555, 579.745, 366.158, 582.544, 380.662, 550.229, 368.193, 551.501, 383.969, 529.109, 362.341, 529.618, 390.585, 520.453, 444.239, 620.118, 437.106, 620.118, 458.661, 620, 530, 630, 520, 620, 540, 620, 550 )
 uv = PoolVector2Array( 520, 550, 680, 550, 680, 530, 620, 490, 620, 430, 600, 300, 560, 260, 520, 300, 603.086, 439.506, 530.658, 442.798, 565.638, 441.152, 604.798, 489.055, 531.934, 546.477, 570.315, 514.992, 577.211, 521.889, 563.418, 507.046, 529.618, 375.827, 598.066, 372.519, 597.048, 358.015, 599.593, 386.514, 566.514, 374.555, 579.745, 366.158, 582.544, 380.662, 550.229, 368.193, 551.501, 383.969, 529.109, 362.341, 529.618, 390.585, 520.453, 444.239, 620.118, 437.106, 620.118, 458.661, 620, 530, 630, 520, 620, 540, 620, 550 )
@@ -763,7 +763,7 @@ position = Vector2( -87.8789, -112.121 )
 rotation = 3.14159
 scale = Vector2( 1, -1 )
 offset = Vector2( -359.485, -310.364 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 360, 310, 410, 310, 470, 400, 470, 500, 440, 520, 410, 520, 390, 500, 390, 360, 360, 320, 420, 370, 440, 390, 420, 400, 450, 470, 420, 470, 400, 480, 440, 410, 420, 430, 440, 430 )
 uv = PoolVector2Array( 360, 310, 410, 310, 470, 400, 470, 500, 440, 520, 410, 520, 390, 500, 390, 360, 360, 320, 420, 370, 440, 390, 420, 400, 450, 470, 420, 470, 400, 480, 440, 410, 420, 430, 440, 430 )
@@ -774,7 +774,7 @@ internal_vertex_count = 9
 [node name="Body" type="Polygon2D" parent="Player/Player Polygons"]
 position = Vector2( -157.273, -176.606 )
 offset = Vector2( -31.1213, -260.788 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 30, 260, 340, 260, 340, 590, 30, 590 )
 uv = PoolVector2Array( 30, 260, 340, 260, 340, 590, 30, 590 )
@@ -784,7 +784,7 @@ bones = [ "Body", PoolRealArray( 1, 1, 1, 1 ), "Body/Head", PoolRealArray( 0, 0,
 [node name="Head" type="Polygon2D" parent="Player/Player Polygons"]
 position = Vector2( -181.515, -337.212 )
 offset = Vector2( -9.87885, -2.18178 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../Skeleton Frog")
 polygon = PoolVector2Array( 10, 260, 10, 0, 370, 0, 370, 260 )
 uv = PoolVector2Array( 10, 260, 10, 0, 370, 0, 370, 260 )
@@ -794,7 +794,7 @@ bones = [ "Body", PoolRealArray( 0, 0, 0, 0 ), "Body/Head", PoolRealArray( 1, 1,
 light_mask = 2
 position = Vector2( 73.5757, 33.6667 )
 offset = Vector2( -410.848, -90.3333 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../../Skeleton Frog")
 polygon = PoolVector2Array( 410, 90, 620, 90, 620, 160, 410, 160 )
 uv = PoolVector2Array( 410, 90, 620, 90, 620, 160, 410, 160 )
@@ -805,7 +805,7 @@ bones = [ "Body", PoolRealArray( 0, 0, 0, 0 ), "Body/Head", PoolRealArray( 1, 1,
 light_mask = 4
 position = Vector2( 73.5757, 73.0606 )
 offset = Vector2( -409.848, -220.727 )
-texture = ExtResource( 9 )
+texture = ExtResource( 7 )
 skeleton = NodePath("../../../Skeleton Frog")
 polygon = PoolVector2Array( 410, 220, 620, 220, 620, 250, 410, 250 )
 uv = PoolVector2Array( 410, 220, 620, 220, 620, 250, 410, 250 )
@@ -821,7 +821,7 @@ rest = Transform2D( 2.22127e-06, -1, 1, 2.22127e-06, -1, 44 )
 default_length = 64.0
 
 [node name="Head" type="Bone2D" parent="Player/Skeleton Frog/Body"]
-position = Vector2( 84.1808, 0.999817 )
+position = Vector2( 84.9912, 0.999817 )
 rotation = 1.57587
 rest = Transform2D( -0.0050744, 0.999987, -0.999987, -0.0050744, 85, 0.999817 )
 
@@ -830,7 +830,7 @@ light_mask = 2
 position = Vector2( -1.39575, -49.9937 )
 rotation = -0.00507665
 scale = Vector2( 0.0759, -0.02475 )
-texture = ExtResource( 7 )
+texture = ExtResource( 12 )
 color = Color( 0, 0, 0, 0 )
 mode = 3
 range_layer_max = 3
@@ -842,7 +842,7 @@ light_mask = 2
 position = Vector2( -1.09912, -23.0151 )
 rotation = -0.00507665
 scale = Vector2( 0.0759, -0.02475 )
-texture = ExtResource( 7 )
+texture = ExtResource( 12 )
 color = Color( 0, 0, 0, 0 )
 mode = 3
 range_layer_max = 3
@@ -861,7 +861,7 @@ rest = Transform2D( 0.85898, 0.51201, -0.51201, 0.85898, 21.9545, -0.0262299 )
 
 [node name="Hand R" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm R/Forearm R"]
 position = Vector2( 27, -0.999954 )
-rotation = 0.128681
+rotation = 0.00137717
 rest = Transform2D( 1, 0, 0, 1, 27, -0.999954 )
 
 [node name="Leg L" type="Bone2D" parent="Player/Skeleton Frog/Body"]
@@ -915,18 +915,18 @@ rest = Transform2D( 0.866026, 0.499999, -0.499999, 0.866026, 21.9545, -0.0262299
 
 [node name="Hand L" type="Bone2D" parent="Player/Skeleton Frog/Body/Arm L/Forearm L"]
 position = Vector2( 28, 4.57764e-05 )
-rotation = 0.128681
+rotation = 0.00137717
 rest = Transform2D( 1, 0, 0, 1, 28, 4.57764e-05 )
 
 [node name="Animations" type="Node" parent="Player"]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Animations"]
 autoplay = "Blinking"
-anims/Blinking = ExtResource( 10 )
-anims/Idling = ExtResource( 11 )
+anims/Blinking = ExtResource( 8 )
+anims/Idling = ExtResource( 1 )
 anims/RESET = SubResource( 4 )
 anims/Walking = SubResource( 9 )
-"anims/Walking 2" = ExtResource( 12 )
+"anims/Walking 2" = ExtResource( 13 )
 
 [node name="AnimationTree" type="AnimationTree" parent="Player/Animations"]
 tree_root = SubResource( 8 )
@@ -948,7 +948,7 @@ shape = SubResource( 15 )
 one_way_collision_margin = 0.0
 
 [node name="BrickSprite" type="Sprite" parent="NPCs/Brick"]
-texture = ExtResource( 5 )
+texture = ExtResource( 2 )
 flip_h = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="NPCs/Brick"]
@@ -975,7 +975,7 @@ shape = SubResource( 17 )
 [node name="JamSprite" type="Sprite" parent="NPCs/Jam"]
 position = Vector2( 12.4126, -6.20621 )
 scale = Vector2( 1, 0.999999 )
-texture = ExtResource( 8 )
+texture = ExtResource( 11 )
 flip_h = true
 
 [node name="Targets" type="Node" parent="NPCs/Jam"]
@@ -987,8 +987,9 @@ position = Vector2( 452, 82 )
 position = Vector2( 350, 0 )
 
 [node name="Dialogue Manager" type="Node" parent="."]
-script = ExtResource( 1 )
-Emotes = [ ExtResource( 6 ), ExtResource( 13 ), ExtResource( 14 ) ]
+script = ExtResource( 4 )
+Emotes = [ ExtResource( 3 ), ExtResource( 6 ), ExtResource( 14 ) ]
+IntFlag = [ 0, 0, 0 ]
 
 [connection signal="body_entered" from="Player/Interact Detector" to="Player" method="_On_Detection_Entered"]
 [connection signal="body_exited" from="Player/Interact Detector" to="Player" method="_On_Detection_Exited"]

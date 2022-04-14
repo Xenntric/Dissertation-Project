@@ -9,9 +9,11 @@ using System.Collections.Generic;
 
 public class DialogueManager : Node
 {
+    [Export] private List<Texture> Emotes;
+    [Export] private List<bool> BoolFlag;
+    [Export] private List<int> IntFlag;
     private DialogueLoader DL;
     private List<Node> NPCstack;
-    [Export] private List<Texture> Emotes;
     private Sprite CurrentEmote;
     private List<NPCs> NPCList;
     private RichTextLabel CurrentText;
@@ -35,10 +37,25 @@ public class DialogueManager : Node
             NPCList[i].Character = (GetNode("../NPCs").GetChild(i));
             NPCList[i].TextFile = (DL.LoadFile(NPCList[i].Character));
 
+
             //If there's no file, don't bother trying to find the lines.
             if(NPCList[i].TextFile != null )
             {
                 NPCList[i].Lines = (DL.LoadLines(NPCList[i].TextFile));
+                NPCList[i].Bools = (DL.LoadBools(NPCList[i].Lines));
+                NPCList[i].Ints  = (DL.LoadInts(NPCList[i].Lines));
+
+                foreach (var Bool in NPCList[i].Bools)
+                {
+                    GD.Print("Bools @ " + NPCList[i].Character.Name + ": " + Bool.Key.ToString());
+                    NPCList[i].TimesTalkedTo++;
+                }
+                foreach (var Int in NPCList[i].Ints)
+                {
+                    GD.Print("Ints @ " + NPCList[i].Character.Name + ": " + Int.Key.ToString() + " = " + Int.Value.ToString());
+                    NPCList[i].TimesTalkedTo++;
+
+                }
             }
         }
 	}
@@ -85,18 +102,28 @@ public class DialogueManager : Node
         }
         else
         {
-            linetosay = new Tuple<string, string>(
-            RegCheck.DIALOGUE.Match(ReadLine).ToString(),
-            PopChar(RegCheck.EMOTE.Match(ReadLine)));
+            //if an emote sprite is already present, get rid of it
+            if (CurrentEmote.Texture != null)
+            {
+                CurrentEmote.Texture = null;
+            }
 
             if (RegCheck.HasEMOTE(ReadLine))
             {
+                linetosay = new Tuple<string, string>(
+                    RegCheck.DIALOGUE.Match(ReadLine).ToString(),
+                    PopChar(RegCheck.EMOTE.Match(ReadLine)));
+
                 enumerator = RegexCheck.Parse.DialogueEmote;
                 GD.Print("Dialogue to read: " + linetosay.Item1);
                 GD.Print("emote to read: " + linetosay.Item2);
             }
             else
             {
+                linetosay = new Tuple<string, string>(
+                    RegCheck.DIALOGUE.Match(ReadLine).ToString(),null);
+                    
+                GD.Print("No Emote Found");
                 enumerator = RegexCheck.Parse.Dialogue;
             }
         }
@@ -110,12 +137,6 @@ public class DialogueManager : Node
         {
             case RegexCheck.Parse.DialogueEmote:
                 {
-                    //if an emote sprite is already present, get rid of it
-                    if (CurrentEmote.Texture != null)
-                    {
-                        CurrentEmote.Texture = null;
-                    }
-
                     DisplayText(character, linetosay.Item1);
                     MatchEmoteToImage(character, linetosay.Item2);
 

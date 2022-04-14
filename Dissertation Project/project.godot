@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="Dissertation Project"
-run/main_scene="res://2dWorld.tscn"
+run/main_scene="res://Scene1.tscn"
 config/icon="res://Assets/Sprites/icon.png"
 
 [input]
