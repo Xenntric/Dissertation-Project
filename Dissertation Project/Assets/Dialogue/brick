@@ -1,14 +1,19 @@
---BOOL(DemoBool)
---INT(FirstDemoInt = 0)
---INT(SecondDemoInt = 4)
+>>BOOL(TalkedToJam)
+>>INT(FirstDemoInt = 0)
+>>INT(SecondDemoInt = 4)
 
 
 Hello there! I hope the demo is going well | !
 and that they're happy with your progress | <3
-| ?
+Have you talked to Jam yet? | ?
+--IF(TalkedToJam)
+* Oh you have! | !
+--IF(!TalkedToJam)
+* Oh I guess not...
 Okay, that's enough now
 Seriously...
 Please.............
 END
 
 
+1

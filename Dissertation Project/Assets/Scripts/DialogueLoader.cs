@@ -13,7 +13,7 @@ public struct DialogueLoader
 
     private List<bool>BoolsToInject;
     private List<int>IntsToInject;
-    
+    private RegexCheck RC;
     public string LoadFile(Node Character)
     {
         var address = System.IO.Path.Combine(@"Assets/Dialogue/",Character.Name.ToLower());
@@ -45,55 +45,55 @@ public struct DialogueLoader
 
     public Dictionary<string,bool> LoadBools(List<string> Lines)
     {
-        var injectable = new Dictionary<string,bool>();
+        var BoolDictionary  = new Dictionary<string,bool>();
         foreach (var line in Lines)
         {
-            if(Regex.IsMatch(line, @"(?:--BOOL)"))
+            if(RC.BOOL.IsMatch(line))
             {
                 var Boolean = Regex.Match(line, @"\((.*?)\)").ToString();
-                Boolean = ShaveAndRemoveWhitespaces(Boolean);
-                injectable.Add(Boolean,false);
+                Boolean = PopFirstLastandWhitespaces(Boolean);
+                BoolDictionary.Add(Boolean,false);
 
                 //GD.Print("Bool Identified: " + Boolean);
             }
         }
 
-        return injectable;
+        return BoolDictionary;
     }
     public Dictionary<string,int> LoadInts(List<string> Lines)
     {
-        var injectable = new Dictionary<string,int>();
+        var IntDictionary = new Dictionary<string,int>();
         foreach (var line in Lines)
         {
-            if(Regex.IsMatch(line, @"(?:--INT)"))
+            if(RC.INT.IsMatch(line))
             {
-                var Interger = Regex.Match(line, @"\((.*?)\)").ToString();
-                var IntName = Regex.Match(Interger,(@"\((.*?)\=")).ToString();
-                IntName = ShaveAndRemoveWhitespaces(IntName);
-                var IntNum = Regex.Match(Interger,(@"\=(.*?)\)")).ToString();
-                IntNum = ShaveAndRemoveWhitespaces(IntNum);
+                var Integer = Regex.Match(line, @"\((.*?)\)").ToString();
+                var IntName = Regex.Match(Integer,(@"\((.*?)\=")).ToString();
+                IntName = PopFirstLastandWhitespaces(IntName);
+                var IntNum = Regex.Match(Integer,(@"\=(.*?)\)")).ToString();
+                IntNum = PopFirstLastandWhitespaces(IntNum);
 
-                injectable.Add(IntName,System.Int16.Parse(IntNum));
+                IntDictionary.Add(IntName,System.Int16.Parse(IntNum));
 
-                //GD.Print("Int Identified: " + IntName + " " + System.Int32.Parse(IntNum).ToString());            
+                GD.Print("Int Identified: " + IntName + " " + System.Int32.Parse(IntNum).ToString() + " from " + Integer.ToString());            
             }
         }
 
-        return injectable;
+        return IntDictionary;
     }
 
     //I recognise this function is ridiculous however I have no idea why the Regex capture *includes* the limiters, so this is necessary
     //It also means if the user includes whitespaces, they'll be handled
-    private static string ShaveAndRemoveWhitespaces(string desirable)
+    public string PopFirstLastandWhitespaces(string text)
     {
         //GD.Print("To strip: " + desirable.ToString());
 
-        List<char> StripChar = new List<char>(desirable.ToString().ToCharArray());
+        List<char> StripChar = new List<char>(text.ToString().ToCharArray());
         StripChar.RemoveAt(0);
         StripChar.RemoveAt(StripChar.Count - 1);
-        var CleanString = new string(StripChar.ToArray());
-        CleanString = String.Concat(CleanString.Where(c => !Char.IsWhiteSpace(c)));
-        return CleanString;
+        var AlteredText = new string(StripChar.ToArray());
+        AlteredText = String.Concat(AlteredText.Where(c => !Char.IsWhiteSpace(c)));
+        return AlteredText;
     }
 
 }

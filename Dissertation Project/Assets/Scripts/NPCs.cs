@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class NPCs
 {
-    public Dictionary<string,int> Ints;
-    public Dictionary<string,bool> Bools;
+    public Dictionary<string,int> Ints {get;set;}
+    public Dictionary<string,bool> Bools {get;set;}
 
     public Node Character;
     public string TextFile;

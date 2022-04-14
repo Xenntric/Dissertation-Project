@@ -1,7 +1,8 @@
---BOOL(JamDemoBool)
+>>BOOL(JamDemoBool)
 
 Beep Beep, this is a test | ?
 lol | test
+--SET(Brick.TalkedToJam = TRUE)
 END
 
 

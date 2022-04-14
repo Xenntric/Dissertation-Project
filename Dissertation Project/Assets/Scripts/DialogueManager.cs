@@ -10,15 +10,15 @@ using System.Collections.Generic;
 public class DialogueManager : Node
 {
     [Export] private List<Texture> Emotes;
-    [Export] private List<bool> BoolFlag;
-    [Export] private List<int> IntFlag;
     private DialogueLoader DL;
     private List<Node> NPCstack;
     private Sprite CurrentEmote;
     private List<NPCs> NPCList;
     private RichTextLabel CurrentText;
+    private RegexCheck RC;
 
-    private RegexCheck RegCheck;
+    private  bool readLine = false;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -27,7 +27,6 @@ public class DialogueManager : Node
 
         AddChild(CurrentEmote = new Sprite());
         AddChild(CurrentText = new RichTextLabel());
-        
 
         CurrentText.BbcodeEnabled = true;
 
@@ -36,7 +35,6 @@ public class DialogueManager : Node
             NPCList.Add(new NPCs());
             NPCList[i].Character = (GetNode("../NPCs").GetChild(i));
             NPCList[i].TextFile = (DL.LoadFile(NPCList[i].Character));
-
 
             //If there's no file, don't bother trying to find the lines.
             if(NPCList[i].TextFile != null )
@@ -83,7 +81,7 @@ public class DialogueManager : Node
                     var character = NPCList[i].Character;
                     Tuple<string, string> linetosay = new Tuple<string, string>(null, null);
 
-                    enumerator = SetEnumerator(ReadLine, ref linetosay);
+                    enumerator = SetEnumerator(NPCList[i], ReadLine, ref linetosay);
                     ActOnEnumerator(i, enumerator, character, linetosay);
 
                     GD.Print("NPC " + NPCList[i].Character.Name);
@@ -93,26 +91,91 @@ public class DialogueManager : Node
         }
     }
 
-    private RegexCheck.Parse SetEnumerator(string ReadLine, ref Tuple<string, string> linetosay)
+    private RegexCheck.Parse SetEnumerator(NPCs npc, string ReadLine, ref Tuple<string, string> linetosay)
     {
         RegexCheck.Parse enumerator;
-        if (RegCheck.END.IsMatch(ReadLine))
+       
+        if (RC.END.IsMatch(ReadLine))
         {
             enumerator = RegexCheck.Parse.End;
         }
+        else if (RC.IF.IsMatch(ReadLine))
+        {
+            var SetLine = DL.PopFirstLastandWhitespaces(Regex.Match(ReadLine, @"\((.*?)\)").ToString());
+            GD.Print("//////////" + SetLine);
+            if(Regex.Match(SetLine, @"[=]").Success && Regex.Match(SetLine, @"[0-9]").Success)
+            {
+                GD.Print("Integer IF");
+            }
+            else
+            {
+                GD.Print("Boolean IF");
+                if(SetLine.Substr(0,1) != "!")
+                {
+                    GD.Print("Searching for True");
+                    //if True
+                    foreach (var key in npc.Bools.Keys)
+                    {
+                        if(key == SetLine && npc.Bools[key])
+                        {
+                            GD.Print(key + " Conditions met true");
+                            readLine = true;
+                        }
+                        else
+                        {
+                            readLine = false;
+                        }
+                    }
+                }
+                else if(SetLine.Substr(0,1) == "!")
+                {
+                    SetLine = PopChar(SetLine, true);
+                    //if false;
+                    foreach (var key in npc.Bools.Keys)
+                    {
+
+                        if(key == SetLine && !npc.Bools[key])
+                        {
+                            GD.Print(key + " Conditions met false ");
+                            readLine = true;
+                        }
+                        else
+                        {
+                            readLine = false;
+                        }
+                    }
+                }
+            } 
+
+            enumerator = RegexCheck.Parse.If;
+        }
+
+        else if (RC.SET.IsMatch(ReadLine))
+        {
+            GD.Print("Found Set");
+            SetInTextVariable(ReadLine);
+            enumerator = RegexCheck.Parse.Set;
+        }
+
         else
         {
+            if(ReadLine.Substr(0,1) == "*" && !readLine)
+            {
+
+                    GD.Print("skipping");
+                    enumerator = RegexCheck.Parse.SkipLine;
+                    return enumerator;
+            }
             //if an emote sprite is already present, get rid of it
             if (CurrentEmote.Texture != null)
             {
                 CurrentEmote.Texture = null;
             }
-
-            if (RegCheck.HasEMOTE(ReadLine))
+            if (RC.HasEMOTE(ReadLine))
             {
                 linetosay = new Tuple<string, string>(
-                    RegCheck.DIALOGUE.Match(ReadLine).ToString(),
-                    PopChar(RegCheck.EMOTE.Match(ReadLine)));
+                    RC.DIALOGUE.Match(ReadLine).ToString(),
+                    PopChar(RC.EMOTE.Match(ReadLine).ToString(),true));
 
                 enumerator = RegexCheck.Parse.DialogueEmote;
                 GD.Print("Dialogue to read: " + linetosay.Item1);
@@ -121,7 +184,7 @@ public class DialogueManager : Node
             else
             {
                 linetosay = new Tuple<string, string>(
-                    RegCheck.DIALOGUE.Match(ReadLine).ToString(),null);
+                    RC.DIALOGUE.Match(ReadLine).ToString(),null);
                     
                 GD.Print("No Emote Found");
                 enumerator = RegexCheck.Parse.Dialogue;
@@ -129,6 +192,64 @@ public class DialogueManager : Node
         }
 
         return enumerator;
+    }
+
+    private void SetInTextVariable(string ReadLine)
+    {
+        //Get Everything between the parentheses 
+        var SetLine = Regex.Match(ReadLine, @"\((.*?)\)").ToString();
+        //Get String before '='
+        var SetVar = DL.PopFirstLastandWhitespaces(Regex.Match(SetLine, (@"\((.*?)\=")).ToString());
+        //Get Character mentioned before the '.'
+        var SetCharacter = DL.PopFirstLastandWhitespaces(Regex.Match(SetLine, (@"\((.*?)\.")).ToString());
+        //Get Variable after '.'
+        var SetType = DL.PopFirstLastandWhitespaces(Regex.Match(SetLine, (@"\.(.*?)\=")).ToString());
+        //Get Value after '='
+        var SetValue = DL.PopFirstLastandWhitespaces(Regex.Match(SetLine, (@"\=(.*?)\)")).ToString());
+
+        GD.Print("Var = " + SetVar);
+        GD.Print("Character = " + SetCharacter);
+        GD.Print("Type = " + SetType);
+        GD.Print("Value = " + SetValue);
+
+
+        foreach (var NPC in NPCList)
+        {
+            if (NPC.Character.Name == SetCharacter)
+            {
+                GD.Print("Found Character");
+
+                foreach (var key in NPC.Bools.Keys)
+                {
+                    GD.Print("Finding Bools");
+                    if (key == SetType)
+                    {
+                        GD.Print("Found Key");
+                        GD.Print("Character: " + NPC.Character.Name + " with key: " + key + " with value: " + NPC.Bools[key]);
+                        NPC.Bools[key] = System.Boolean.Parse(SetValue);
+                        GD.Print("Character: " + NPC.Character.Name + " with key: " + key + " with value: " + NPC.Bools[key]);
+                        GD.Print("Set Key");
+                        break;
+                    }
+
+                    GD.Print("Checking next Bool");
+                }
+
+                GD.Print("Moving on to ints...");
+
+                foreach (var key in NPC.Ints.Keys)
+                {
+                    GD.Print("Finding Ints");
+                    if (key == SetType)
+                    {
+                        GD.Print("Found Key");
+                        NPC.Ints[key] = System.Int32.Parse(SetValue);
+                        break;
+                    }
+                }
+
+            }
+        }
     }
 
     private void ActOnEnumerator(int i, RegexCheck.Parse enumerator, Node character, Tuple<string, string> linetosay)
@@ -152,9 +273,39 @@ public class DialogueManager : Node
                 }
             case RegexCheck.Parse.End:
                 {
+                    GD.Print("Ending");
                     DisplayText(character, null);
+                    GD.Print("Ended");
+
                     break;
                 }
+            case RegexCheck.Parse.If:
+                {
+                    
+                    //Because this line is a function, I don't want it to interrupt the flow of the
+                    //Dialogue, so I am forcing the next line to get read
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+
+                    ReadLine();
+                    break;
+                }
+            case RegexCheck.Parse.Set:
+                {
+                    GD.Print("Incrementing Talked to");
+                    
+                    
+                    //Because this line is a function, I don't want it to interrupt the flow of the
+                    //Dialogue, so I am forcing the next line to get read
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+
+                    ReadLine();
+                    break;
+                }
+            case RegexCheck.Parse.SkipLine:
+                {
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+                    ReadLine();
+                    break;                }
 
             default:
                 break;
@@ -200,6 +351,10 @@ public class DialogueManager : Node
 
         CurrentText.RectSize = new Vector2(CurrentText.GetFont("mono_font").GetStringSize(DialogueToEnact) * 2);
         var centre = new Vector2(CurrentText.RectSize.x / 2, 0);
+        if(DialogueToEnact != null && DialogueToEnact.Substr(0,1) == "*")
+        {
+            DialogueToEnact = PopChar(DialogueToEnact, false);
+        }
         CurrentText.BbcodeText = ("[center]" + DialogueToEnact + "[/center]");
 
         CurrentText.SetGlobalPosition(new Vector2(TextPoint.Position) - centre);
@@ -207,14 +362,17 @@ public class DialogueManager : Node
         //CurrentText.SetIndexed("position:z", 100);
     }
 
-    private static string PopChar(Match emoteReg)
+    private static string PopChar(string emoteReg, bool removeWhiteSpaces)
     {
         GD.Print("To strip: " + emoteReg.ToString());
 
-        List<char> StripChar = new List<char>(emoteReg.ToString().ToCharArray());
+        List<char> StripChar = new List<char>(emoteReg.ToCharArray());
         StripChar.RemoveAt(0);
         var emote = new string(StripChar.ToArray());
-        emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
+        if(removeWhiteSpaces)
+        {
+            emote = String.Concat(emote.Where(c => !Char.IsWhiteSpace(c)));
+        }
         return emote;
     }
 
@@ -226,8 +384,6 @@ public class DialogueManager : Node
     {
         NPCstack.RemoveAt(0);
     }
-
-    
 
     /* EditorSelection editorSelection;
     public Godot.Collections.Array returnSelection()

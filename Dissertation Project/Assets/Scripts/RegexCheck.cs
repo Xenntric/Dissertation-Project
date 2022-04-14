@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Text.RegularExpressions;
-
+using System.Collections.Generic;
 public struct RegexCheck
 {
     public enum Parse
@@ -9,7 +9,9 @@ public struct RegexCheck
         DialogueEmote,
         Dialogue,
         End,
-        If
+        If,
+        Set,
+        SkipLine,
     } 
 
     public Regex DIALOGUE
@@ -29,14 +31,13 @@ public struct RegexCheck
         return false;
     }
 
-
     //End of Text File
     public Regex END
     {
         get{return new Regex(@"^(?:END)\n");}
     }
 
-    //Start of Loop
+    /* //Start of Loop
     public Regex SLOOP
     {
         get{return new Regex(@"^(?:SLOOP)");}
@@ -50,11 +51,28 @@ public struct RegexCheck
     public Regex BLOOP
     {
         get{return new Regex(@"^(?:BLOOP)");}
+    } */
+    
+    //Bool Conditional
+    public Regex BOOL
+    {
+        get{return new Regex(@"^(?:>>BOOL)");}
     }
+    //Integer Conditional
+    public Regex INT
+    {
+        get{return new Regex(@"^(?:>>INT)");}
+    }
+
+
+    //If Command
     public Regex IF
     {
-        get{return new Regex(@"^(?:BLOOP)");}
+        get{return new Regex(@"^(?:--IF)");}
     }
-
-
+    //Set conditional to
+    public Regex SET
+    {
+        get{return new Regex(@"^(?:--SET)");}
+    }
 }
