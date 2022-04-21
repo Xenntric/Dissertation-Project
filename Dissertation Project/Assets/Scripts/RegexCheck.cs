@@ -12,6 +12,8 @@ public struct RegexCheck
         If,
         Set,
         SkipLine,
+        PlayAnimation,
+
     } 
 
     public Regex DIALOGUE
@@ -74,5 +76,9 @@ public struct RegexCheck
     public Regex SET
     {
         get{return new Regex(@"^(?:--SET)");}
+    }
+    public Regex PLAY
+    {
+        get{return new Regex(@"^(?:--PLAY)");}
     }
 }

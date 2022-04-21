@@ -11,4 +11,5 @@ public class NPCs
     public string TextFile;
     public List<string> Lines;
     public int TimesTalkedTo = 0;
+    public AnimationPlayer AnimationPlayer;
 }

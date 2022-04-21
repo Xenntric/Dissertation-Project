@@ -52,7 +52,6 @@ public class DialogueManager : Node
                 {
                     GD.Print("Ints @ " + NPCList[i].Character.Name + ": " + Int.Key.ToString() + " = " + Int.Value.ToString());
                     NPCList[i].TimesTalkedTo++;
-
                 }
             }
         }
@@ -99,10 +98,29 @@ public class DialogueManager : Node
         {
             enumerator = RegexCheck.Parse.End;
         }
+        else if(RC.PLAY.IsMatch(ReadLine))
+        {
+            foreach (Node child in npc.Character.GetChildren())
+            {
+                if(child is AnimationPlayer)
+                {
+                    npc.AnimationPlayer = GetNode<AnimationPlayer>(child.GetPath());
+                }
+            }
+
+            //Get Everything between the parentheses 
+            var SetLine = Regex.Match(ReadLine, @"\((.*?)\)").ToString();
+            GD.Print(SetLine);
+            SetLine = DL.PopFirstLastandWhitespaces(SetLine);
+            
+            GD.Print(SetLine);
+
+            npc.AnimationPlayer.Play(SetLine);
+            enumerator = RegexCheck.Parse.PlayAnimation;
+        }
         else if (RC.IF.IsMatch(ReadLine))
         {
             var SetLine = DL.PopFirstLastandWhitespaces(Regex.Match(ReadLine, @"\((.*?)\)").ToString());
-            GD.Print("//////////" + SetLine);
             if(Regex.Match(SetLine, @"[=]").Success && Regex.Match(SetLine, @"[0-9]").Success)
             {
                 GD.Print("Integer IF");
@@ -112,13 +130,11 @@ public class DialogueManager : Node
                 GD.Print("Boolean IF");
                 if(SetLine.Substr(0,1) != "!")
                 {
-                    GD.Print("Searching for True");
                     //if True
                     foreach (var key in npc.Bools.Keys)
                     {
                         if(key == SetLine && npc.Bools[key])
                         {
-                            GD.Print(key + " Conditions met true");
                             readLine = true;
                         }
                         else
@@ -136,7 +152,6 @@ public class DialogueManager : Node
 
                         if(key == SetLine && !npc.Bools[key])
                         {
-                            GD.Print(key + " Conditions met false ");
                             readLine = true;
                         }
                         else
@@ -161,7 +176,6 @@ public class DialogueManager : Node
         {
             if(ReadLine.Substr(0,1) == "*" && !readLine)
             {
-
                     GD.Print("skipping");
                     enumerator = RegexCheck.Parse.SkipLine;
                     return enumerator;
@@ -293,7 +307,6 @@ public class DialogueManager : Node
                 {
                     GD.Print("Incrementing Talked to");
                     
-                    
                     //Because this line is a function, I don't want it to interrupt the flow of the
                     //Dialogue, so I am forcing the next line to get read
                     NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
@@ -305,7 +318,14 @@ public class DialogueManager : Node
                 {
                     NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
                     ReadLine();
-                    break;                }
+                    break;                
+                }
+            case RegexCheck.Parse.PlayAnimation:
+                {
+                    NPCList[i].TimesTalkedTo = (NPCList[i].TimesTalkedTo + 1);
+                    ReadLine();
+                    break;
+                }
 
             default:
                 break;

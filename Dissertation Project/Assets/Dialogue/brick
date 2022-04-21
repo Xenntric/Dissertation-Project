@@ -8,12 +8,13 @@ and that they're happy with your progress | <3
 Have you talked to Jam yet? | ?
 --IF(TalkedToJam)
 * Oh you have! | !
+* They're quite nice right? | ?
 --IF(!TalkedToJam)
 * Oh I guess not...
+--PLAY(brickTalking)
 Okay, that's enough now
 Seriously...
 Please.............
 END
 
 
-1
