@@ -20,6 +20,7 @@ public class DialogueManager : Node
     private RichTextLabel CurrentText;
     private Sprite CurrentEmote;
 
+    private Node targetNPC;
     private  bool readLine = false;
 
 	public override void _Ready()
@@ -60,15 +61,23 @@ public class DialogueManager : Node
 	}
     public void ReadLine()
     {
+        GD.Print("NPCstack volume = " + NPCstack.Count);
+        foreach (var NPC in NPCstack)
+        {
+            GD.Print(NPC.Name);
+        }
         //If the Player is near an NPC
-        if(NPCstack != null)
-        {  
+        if(NPCstack.Any())
+        { 
             //For(amount of NPCs in Scene)
             for (int i = 0; i < NPCList.Count; i++)
             {
-                //First Match of Nearby NPC
-                if(NPCstack.Contains(NPCList[i].Character))
+                GD.Print("searching for: " + NPCList[i].Character.Name);
+
+                //Finds latest NPC the player has collided with
+                if (NPCstack[NPCstack.Count -1] == NPCList[i].Character)
                 {
+                    targetNPC = NPCList[i].Character;
                     var enumerator = new RegexCheck.Parse();
 
                     /***CATCH FOR NOT FINDING FILE ***/
@@ -87,6 +96,7 @@ public class DialogueManager : Node
 
                     GD.Print("NPC " + NPCList[i].Character.Name);
                     GD.Print("Times Talked To: " + NPCList[i].TimesTalkedTo);
+                    return;
                 }
             }
         }
@@ -146,6 +156,7 @@ public class DialogueManager : Node
                     npc.AnimationPlayer = GetNode<AnimationPlayer>(child.GetPath());
                 }
             }
+
             npc.AnimationPlayer.Stop();
             npc.AnimationPlayer.Play(Check.CaptureParentheses(ReadLine));
             enumerator = RegexCheck.Parse.PlayAnimation;
@@ -286,11 +297,11 @@ public class DialogueManager : Node
 
     private void SetInTextVariable(string ReadLine)
     {
-        var SetLine = Check.CaptureParentheses(ReadLine);
-        var SetVar = Logic.PopLast(Check.CaptureWithin("^","=",SetLine));
+        var SetLine      = Check.CaptureParentheses(ReadLine);
+        var SetVar       = Logic.PopLast(Check.CaptureWithin("^","=",SetLine));
         var SetCharacter = Logic.PopLast(Check.CaptureWithin("^",".",SetLine));
-        var SetType = Logic.PopFirst(Logic.PopLast(Check.CaptureWithin(".","=",SetLine)));
-        var SetValue = Logic.PopFirst(Check.CaptureWithin("=","$",SetLine));
+        var SetType      = Logic.PopFirst(Logic.PopLast(Check.CaptureWithin(".","=",SetLine)));
+        var SetValue     = Logic.PopFirst(Check.CaptureWithin("=","$",SetLine));
 
         GD.Print("Var = " + SetVar);
         GD.Print("Character = " + SetCharacter);
@@ -457,9 +468,15 @@ public class DialogueManager : Node
     {
         NPCstack.Add(NPC);
     }
-    public void PopNPC()
+    public void PopNPC(Node NPC)
     {
-        NPCstack.RemoveAt(0);
+        if(NPC == targetNPC)
+        {
+            CurrentText.Clear();
+            CurrentEmote.Texture = null;
+        }
+        NPCstack.Remove(NPC);
+        GD.Print("Npc stack @: " + (NPCstack.Count));
     }
 
     /* EditorSelection editorSelection;

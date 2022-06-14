@@ -85,7 +85,7 @@ public class PlayerMovement : KinematicBody2D
 	}
     public void _On_Detection_Exited(StaticBody2D body)
 	{
-        DM.PopNPC();
+        DM.PopNPC(body);
         GD.Print("on body exited " + body.Name);
 	}
 }
