@@ -14,14 +14,17 @@ Have you talked to Jam yet? | ?
 * Oh I guess not...
 * --SET(Jam.JamDemoBool = TRUE)
 * well, it doesn't matter! | !
+
 --SET(Brick.FunPoints = 2)
 --IF(FunPoints = 0)
 * --PLAY(brickTalking)
 * I'm distraught! I have no Funpoints!! | !
 
---PLAY(brickTalking)
+
 Okay, that's enough now
-Seriously...
-Please.............
+|<3
+I hope you have...
+--PLAY(brickTalking)
+A lovely day! | !
 END
 

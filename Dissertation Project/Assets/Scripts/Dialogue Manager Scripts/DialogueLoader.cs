@@ -13,7 +13,7 @@ public struct DialogueLoader
     
     public string LoadFile(Node Character)
     {
-        var address = System.IO.Path.Combine(@"Assets/Dialogue/",Character.Name.ToLower());
+        var address = System.IO.Path.Combine(@"Assets/Dialogue/",Character.Name);
         //If file can't be found
         if(!System.IO.File.Exists(address))
         {

@@ -1,0 +1,9 @@
+>>BOOL(JamDemoBool)
+
+This is just some test dialogue | !
+This line is to test an incorrect emote being entered | test
+--SET(Brick.TalkedToJam = TRUE)
+You have now talked to Jam!
+END
+
+

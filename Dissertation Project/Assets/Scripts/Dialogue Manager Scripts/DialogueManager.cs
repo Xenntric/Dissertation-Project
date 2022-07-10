@@ -79,11 +79,27 @@ public class DialogueManager : Node
                 {
                     targetNPC = NPCList[i].Character;
                     var enumerator = new RegexCheck.Parse();
-
+                    
                     /***CATCH FOR NOT FINDING FILE ***/
                     if (NPCList[i].TextFile == null)
                     {
-                        GD.Print("No File for " + NPCList[i].Character.Name + " found");
+                        GD.PrintErr("No File for " + NPCList[i].Character.Name + " found");
+                        return;
+                    }
+
+                    /*** CATCH FOR NO TARGETS NODE***/
+                    var HasTargetNode = false;
+                    foreach (Node child in targetNPC.GetChildren())
+                    {
+                        if(child.Name == "Targets")
+                        {
+                            HasTargetNode = true;
+                            break;
+                        }
+                    }
+                    if(!HasTargetNode)
+                    {
+                        GD.PrintErr(NPCList[i].Character.Name+ " has no 'Targets' node");
                         return;
                     }
 
@@ -149,16 +165,25 @@ public class DialogueManager : Node
 
         else if(Check.PLAY.IsMatch(ReadLine))
         {
+            var HasAnimPlayer = false;
             foreach (Node child in npc.Character.GetChildren())
             {
                 if(child is AnimationPlayer)
                 {
+                    HasAnimPlayer = true;
                     npc.AnimationPlayer = GetNode<AnimationPlayer>(child.GetPath());
                 }
             }
 
-            npc.AnimationPlayer.Stop();
-            npc.AnimationPlayer.Play(Check.CaptureParentheses(ReadLine));
+            if(HasAnimPlayer)
+            {
+                npc.AnimationPlayer.Stop();
+                npc.AnimationPlayer.Play(Check.CaptureParentheses(ReadLine));
+            }
+            else
+            {
+                GD.PrintErr("No Animation Player Found");
+            }
             enumerator = RegexCheck.Parse.PlayAnimation;
         }
         else
@@ -369,7 +394,9 @@ public class DialogueManager : Node
                 }
             case RegexCheck.Parse.End:
                 {
+                    //Clear all Text and Emotes on screen
                     DisplayText(character, null);
+                    CurrentEmote.Texture = null;                    
                     GD.Print("Ended");
                     break;
                 }
@@ -437,7 +464,10 @@ public class DialogueManager : Node
     private void DisplayEmote(Texture image, string NPCsPath, StaticBody2D NPCproperties)
     {
         //Targets the EmotePoint node which needs to be the first Child of 'Targets'
+        
         var EmotePoint = GetNode(new NodePath(NPCsPath + "/" + "Targets")).GetChild(0) as Node2D;
+        var NPCPoint = GetNode(new NodePath(NPCsPath)) as Node2D;
+        GD.Print("Emote Position: " + EmotePoint.Position);
 
         //Set Emote to desired PNG
         CurrentEmote.Texture = image;
