@@ -37,12 +37,29 @@ public struct RegexCheck
     }
     public bool Has(string stringToCheck, string text)
     {
-        stringToCheck = Regex.Unescape(stringToCheck);
-        if(Regex.IsMatch(text,@"[{stringToCheck}]"))
+        if(text.Length >= 1)
         {
-            return true;
+            var charArray = text.ToCharArray();
+            foreach (var character in charArray)
+            {
+                if(character.ToString() == stringToCheck)
+                {
+                    return true;
+                }
+            };
         }
-        return false;
+        else
+        {
+
+            stringToCheck = Regex.Unescape(stringToCheck);
+            if(Regex.IsMatch(text,@"[{stringToCheck}]"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        return false; 
     }
 
     public Regex FILENAME

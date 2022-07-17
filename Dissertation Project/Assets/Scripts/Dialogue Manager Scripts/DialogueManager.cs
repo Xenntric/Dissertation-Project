@@ -217,6 +217,44 @@ public class DialogueManager : Node
 
     private string IfBool(NPCs npc, string SetLine)
     {
+        bool trueFalsePath = false;
+        string GetVar = "";
+        string GetCharacter;
+        
+        //If user is trying to reference another character's booleans
+        if(Check.Has(".", SetLine))
+        {
+            GetVar = Logic.PopFirst(Check.CaptureWithin(".","$",SetLine));
+            if (SetLine.Substr(0, 1) == "!")
+            {
+                GetCharacter = Logic.PopFirst(Logic.PopLast(Check.CaptureWithin("^",".",SetLine))).ToString();
+                trueFalsePath = false;
+            }
+            else
+            {
+                GetCharacter = Logic.PopLast(Check.CaptureWithin("^",".",SetLine)).ToString();
+                trueFalsePath = true;
+            }
+
+            foreach (var NPC in NPCList)
+            {
+                if(NPC.Character.Name == GetCharacter)
+                {
+                    npc = NPC;
+                    SetLine = GetVar;
+                    if(!trueFalsePath)
+                    {
+                        SetLine = "!" + GetVar;
+                    }
+                }
+            }
+        }
+
+        GD.Print("CHARACTER TO CHECK: " + npc.Character.Name);
+        GD.Print("BOOL TO CHECK: " + GetVar);
+        GD.Print("PARSE: " + SetLine);
+
+        
         GD.Print("Boolean IF");
         if (SetLine.Substr(0, 1) != "!")
         {
@@ -225,11 +263,13 @@ public class DialogueManager : Node
             {
                 if (key == SetLine && npc.Bools[key])
                 {
+                    GD.Print("Got it!");
                     readLine = true;
                     break;
                 }
                 else
                 {
+                    GD.Print("TRUE cant find");
                     readLine = false;
                 }
             }
@@ -244,11 +284,13 @@ public class DialogueManager : Node
 
                 if (key == SetLine && !npc.Bools[key])
                 {
+                    GD.Print("Got it!");
                     readLine = true;
                     break;
                 }
                 else
                 {
+                    GD.Print("FALSE cant find");
                     readLine = false;
                 }
             }

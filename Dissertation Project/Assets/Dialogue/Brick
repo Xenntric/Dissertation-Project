@@ -1,7 +1,7 @@
 >>BOOL(TalkedToJam)
 >>INT(FunPoints = 0)
 >>INT(SecondDemoInt = 4)
-
+>>BOOL(SadPath)
 
 Hello there! I hope the demo is going well | !
 and that they're happy with your progress | <3
@@ -12,6 +12,7 @@ Have you talked to Jam yet? | ?
 
 --IF(!TalkedToJam)
 * Oh I guess not...
+* --SET(Brick.SadPath = TRUE)
 * --SET(Jam.JamDemoBool = TRUE)
 * well, it doesn't matter! | !
 
